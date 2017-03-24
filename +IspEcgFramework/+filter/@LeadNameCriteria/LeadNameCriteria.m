@@ -16,7 +16,7 @@ classdef LeadNameCriteria < IspEcgFramework.filter.LeadCriteria
             if nargin >= 2 && ~isstring(acceptedNames)
                 throw(MException('IspEcgFramework:filter:LeadNameFilter:Constructor:invalidAcceptedNames', 'acceptedNames argument is not of type string'));
             end
-            if nargin >= 3 && (isempty(defaultAccept) || islogical(defaultAccept))
+            if nargin >= 3 && (isempty(defaultAccept) || ~islogical(defaultAccept))
                 throw(MException('IspEcgFramework:filter:LeadNameFilter:Constructor:invalidDefaultAccept', 'defaultAccept argument is not of type logcial'));
             end
             
