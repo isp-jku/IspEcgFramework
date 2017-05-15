@@ -1,5 +1,5 @@
 classdef Data < handle & matlab.mixin.Copyable
-    %Data Contains data to be analyzed
+    % Data Contains data to be analyzed
     %   Data is basically a list of Recordings
     
     properties
@@ -70,7 +70,7 @@ classdef Data < handle & matlab.mixin.Copyable
             end
         end
         
-        function featureVector = extractFeature(obj, recordingVisitor, leadVisitor, markerVisitor)
+        function dataFeatureSet = extractFeatureSet(obj, recordingVisitor, leadVisitor, markerVisitor)
             % check if arguments are of correct type
             if length(recordingVisitor)~=1 || ~isa(recordingVisitor, 'IspEcgFramework.extraction.RecordingVisitor')
                 throw(MException('IspEcgFramework:Data:filter:invalidRecordingCriteria', 'recordingCriterias argument is not an instance of RecordingCriteria'));
@@ -82,14 +82,18 @@ classdef Data < handle & matlab.mixin.Copyable
                 throw(MException('IspEcgFramework:Data:filter:invalidMarkerCriteria', 'markerCriteria argument is not an instance of MarkerCriteria'));
             end
             
-            featureVector = [];
+            dataFeatureSet = IspEcgFramework.data.DataFeatureSet();
             for i = 1:length(obj.Recordings)
-                featureVector = [featureVector obj.Recordings(i).extractFeature(recordingVisitor, leadVisitor, markerVisitor)];
+                if (obj.Recordings(i).Name == '')
+                    key = char(obj.Recordings(i).Name);
+                else
+                    key = num2str(i);
+                end
+                dataFeatureSet.RecordingFeatures(key) = obj.Recordings(i).extractFeature(recordingVisitor, leadVisitor, markerVisitor);
+                % featureVector = [featureVector obj.Recordings(i).extractFeature(recordingVisitor, leadVisitor, markerVisitor)];
             end
         end
     end
-    
-    
     
     methods(Access = protected)
         function data = copyElement(obj)

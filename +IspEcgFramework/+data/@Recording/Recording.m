@@ -1,7 +1,6 @@
 classdef Recording < matlab.mixin.SetGetExactNames & matlab.mixin.Copyable & matlab.mixin.CustomDisplay
-    
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Recording Holds the data of a single ECG recording including leads
+    % and beat markers
     
     properties
         Name string;   % name of the recording
@@ -25,7 +24,7 @@ classdef Recording < matlab.mixin.SetGetExactNames & matlab.mixin.Copyable & mat
             obj.MultileadMarkers = [obj.MultileadMarkers marker];
         end
         
-        function featureVector = extractFeature(obj, recordingVisitor, leadVisitor, markerVisitor)
+        function recordingFeatureSet = extractFeature(obj, recordingVisitor, leadVisitor, markerVisitor)
             if length(recordingVisitor)~=1 || ~isa(recordingVisitor, 'IspEcgFramework.extraction.RecordingVisitor')
                 throw(MException('IspEcgFramework:data:Data:extractFeature:invalidRecordingVisitor', 'recordingVisitor argument is not an instance of RecordingVisitor'));
             end
@@ -36,9 +35,11 @@ classdef Recording < matlab.mixin.SetGetExactNames & matlab.mixin.Copyable & mat
                 throw(MException('IspEcgFramework:data:Data:extractFeature:invalidMarkerVisitor', 'markerVisitor argument is not an instance of MarkerVisitor'));
             end
             
-            featureVector = recordingVisitor.visit(obj);
+            recordingFeatureSet = IspEcgFramework.data.RecordingFeatureSet();
+            recordingFeatureSet.RecordingFeature = recordingVisitor.visit(obj);
             for i = 1:length(obj.Leads)
-                featureVector = [featureVector obj.Leads(i).extractFeature(obj, leadVisitor, markerVisitor)];
+                recordingFeatureSet.LeadFeatures(char(obj.Leads(i).Name)) = obj.Leads(i).extractFeature(obj, leadVisitor, markerVisitor);
+                % featureVector = [featureVector obj.Leads(i).extractFeature(obj, leadVisitor, markerVisitor)];
             end
         end
     end
@@ -49,8 +50,8 @@ classdef Recording < matlab.mixin.SetGetExactNames & matlab.mixin.Copyable & mat
             recording.Leads = obj.Leads.copy();
             recording.MultileadMarkers = obj.MultileadMarkers.copy();
         end
-%         function displayScalarObject(obj)
-%             disp(['Recording ', obj.Name]);
-%         end
+        %         function displayScalarObject(obj)
+        %             disp(['Recording ', obj.Name]);
+        %         end
     end
 end

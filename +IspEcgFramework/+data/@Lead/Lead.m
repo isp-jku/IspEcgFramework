@@ -1,5 +1,6 @@
 classdef Lead < handle & matlab.mixin.SetGetExactNames & matlab.mixin.Copyable
-    %Lead Represents a single ecg lead
+    % Lead Represents a single ecg lead and holts it's data including beat
+    % an annotation markers.
     
     properties
         Name string;     % name of the recording
@@ -22,7 +23,7 @@ classdef Lead < handle & matlab.mixin.SetGetExactNames & matlab.mixin.Copyable
             obj.Markers = [obj.Markers marker];
         end
         
-        function featureVector = extractFeature(obj, recording, leadVisitor, markerVisitor)
+        function leadFeatureSet = extractFeature(obj, recording, leadVisitor, markerVisitor)
             if length(recording)~=1 || ~isa(recording, 'IspEcgFramework.data.Recording')
                 throw(MException('IspEcgFramework:data:Lead:extractFeature:invalidRecordingVisitor', 'recording argument is not an instance of Recording'));
             end
@@ -33,9 +34,12 @@ classdef Lead < handle & matlab.mixin.SetGetExactNames & matlab.mixin.Copyable
                 throw(MException('IspEcgFramework:data:Lead:extractFeature:invalidMarkerVisitor', 'markerVisitor argument is not an instance of MarkerVisitor'));
             end
             
-            featureVector = leadVisitor.visit(recording, obj);
+            leadFeatureSet = IspEcgFramework.data.LeadFeatureSet();
+            leadFeatureSet.LeadFeature = leadVisitor.visit(recording, obj);
+            
             for i = 1:length(obj.Markers)
-                featureVector = [featureVector obj.Markers(i).extractFeature(recording, obj, markerVisitor)];
+                leadFeatureSet.MarkerFeatures(num2str(i)) = obj.Markers(i).extractFeature(recording, obj, markerVisitor);
+                % featureVector = [featureVector obj.Markers(i).extractFeature(recording, obj, markerVisitor)];
             end
         end
     end

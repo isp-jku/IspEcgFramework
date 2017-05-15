@@ -3,7 +3,7 @@ classdef Marker < handle & matlab.mixin.SetGetExactNames & matlab.mixin.Heteroge
     %   Detailed explanation goes here
     
     methods
-        function featureVector = extractFeature(obj, recording, lead, markerVisitor)
+        function featureSetEntry = extractFeature(obj, recording, lead, markerVisitor)
             if length(recording)~=1 || ~isa(recording, 'IspEcgFramework.data.Recording')
                 throw(MException('IspEcgFramework:data:Marker:extractFeature:invalidRecording', 'recording argument is not an instance of Recording'));
             end
@@ -14,7 +14,7 @@ classdef Marker < handle & matlab.mixin.SetGetExactNames & matlab.mixin.Heteroge
                 throw(MException('IspEcgFramework:data:Marker:extractFeature:invalidMarkerVisitor', 'markerVisitor argument is not an instance of MarkerVisitor'));
             end
             
-            featureVector = markerVisitor.visit(recording, lead, obj);
+            featureSetEntry = markerVisitor.visit(recording, lead, obj);
         end
     end
     
